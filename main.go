@@ -4,11 +4,6 @@ import (
 	"log"
 	"text/template"
 
-	// "net/http"
-
-	// "html/template"
-
-	// "github.com/gorilla/mux"
 	"github.com/k-2tha-brimm/clone/actions"
 )
 
