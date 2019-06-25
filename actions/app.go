@@ -89,3 +89,4 @@ func forceSSL() buffalo.MiddlewareFunc {
 		SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
 	})
 }
+

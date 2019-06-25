@@ -2,16 +2,18 @@ package main
 
 import (
 	"log"
+	"text/template"
 
+	// "net/http"
+
+	// "html/template"
+
+	// "github.com/gorilla/mux"
 	"github.com/k-2tha-brimm/clone/actions"
 )
 
-// main is the starting point for your Buffalo application.
-// You can feel free and add to this `main` method, change
-// what it does, etc...
-// All we ask is that, at some point, you make sure to
-// call `app.Serve()`, unless you don't want to start your
-// application that is. :)
+var templates *template.Template
+
 func main() {
 	app := actions.App()
 	if err := app.Serve(); err != nil {
