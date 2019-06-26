@@ -10,6 +10,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// User is meant to be used below
 type User struct {
 	username       string
 	email          string
@@ -72,10 +73,12 @@ func main() {
 
 }
 
+// HomeHandler will render the root template. Currently does not work.
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "../../../index.html")
 }
 
+// UsersShow will be the users profile page
 func UsersShow(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, http.StatusText(405), 405)
