@@ -32,7 +32,7 @@ func init() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-		
+
 	db, err = sql.Open("postgres", psqlInfo)
 
 	if err != nil {
@@ -83,12 +83,13 @@ func UsersShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.FormValue("id")
+	fmt.Printf(id)
 	if id == "" {
 		http.Error(w, http.StatusText(400), 400)
 		return
 	}
 
-	row := db.QueryRow("SELECT * FROM users WHERE id = $1")
+	row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
 
 	user := new(User)
 	err := row.Scan(&user.username, &user.email, &user.passwordDigest, &user.id)
