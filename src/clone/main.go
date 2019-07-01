@@ -18,6 +18,18 @@ type User struct {
 	id             int
 }
 
+// Credentials is a struct that stores data from request body for signing
+type Credentials struct {
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+// Claims will be the encoded jwt
+type Claims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
 const (
 	host     = "localhost"
 	port     = 5432
@@ -50,6 +62,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler).Methods("GET")
 	r.HandleFunc("/users/show", UsersShow).Methods("GET")
+	r.HandleFunc("/signin", SignIn).Methods("GET")
 	port := ":3000"
 
 	fmt.Println("App is listening on port " + port)
@@ -106,4 +119,17 @@ func UsersShow(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "%s, %s, %d", user.username, user.email, user.id)
 
+}
+
+// SignIn is a sign in handler
+func SignIn(w http.ResponseWriter, r *http.Request) {
+	var creds Credentials
+
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	password := r.FormValue("password")
 }
