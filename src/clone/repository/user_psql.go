@@ -1,12 +1,13 @@
-package UserRepository
+package userrepository
 
 import (
 	"database/sql"
 	"log"
-	"NutFlux/models"
+	"../models"
 )
 
-type userRepository struct{}
+// UserRepository struct
+type UserRepository struct{}
 
 func logFatal(err error) {
 	if err != nil {
@@ -14,12 +15,12 @@ func logFatal(err error) {
 	}
 }
 
-// SignUp will sign the user up and add them into the db
-func (u UserRepository) SignUp(db *sql.DB, user models.User) models.User {
+// Signup will sign the user up and add them into the db
+func (u UserRepository) Signup(db *sql.DB, user models.User) models.User {
 	sqlStatement := `
-		INSERT INTO users (username, password_digest, email)
+		INSERT INTO users (username, password, email)
 		VALUES ($1, $2, $3)
-		RETURNING id`
+		RETURNING id;`
 
 	err := db.QueryRow(sqlStatement, user.Username, user.Password, user.Email).Scan(&user.ID)
 	if err != nil {

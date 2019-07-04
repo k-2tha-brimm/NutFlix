@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"fmt"
 
+	"../repository"
 	"../models"
 	"../utils"
 
@@ -40,7 +42,7 @@ func (c Controller) Login(db *sql.DB) http.HandlerFunc {
 
 		password := user.Password
 
-		userRepo := userRepository.UserRepository{}
+		userRepo := userrepository.UserRepository{}
 		user, err := userRepo.Login(db, user)
 
 		log.Println(err)
@@ -83,12 +85,13 @@ func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		var error models.Error
-
+		
 		json.NewDecoder(r.Body).Decode(&user)
+		fmt.Printf("%+v\n", user)
 
 		if user.Email == "" {
-			error.Message = "Email is missing."
-			utils.RespondWithError(w, http.StatusBadRequest, error)
+			fmt.Printf("%+v\n", user)
+			// utils.RespondWithError(w, http.StatusBadRequest, error)
 			return
 		}
 
@@ -106,7 +109,7 @@ func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
 
 		user.Password = string(hash)
 
-		userRepo := userRepository.UserRepository{}
+		userRepo := userrepository.UserRepository{}
 		user = userRepo.Signup(db, user)
 
 		if err != nil {
