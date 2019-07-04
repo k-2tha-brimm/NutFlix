@@ -90,8 +90,8 @@ func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
 		fmt.Printf("%+v\n", user)
 
 		if user.Email == "" {
-			fmt.Printf("%+v\n", user)
-			// utils.RespondWithError(w, http.StatusBadRequest, error)
+			error.Message = "Email is missing."
+			utils.RespondWithError(w, http.StatusBadRequest, error)
 			return
 		}
 
