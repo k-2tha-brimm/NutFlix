@@ -47,6 +47,7 @@ func main() {
 
 	// r.HandleFunc("/users/show", UsersShow).Methods("GET")
 	r.HandleFunc("/signup", controller.Signup(db)).Methods("POST")
+	r.HandleFunc("/login", controller.Login(db)).Methods("POST")
 	port := ":5000"
 
 	fmt.Println("App is listening on port " + port)
