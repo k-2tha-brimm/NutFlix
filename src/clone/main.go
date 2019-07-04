@@ -4,19 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"log"
+	"./controllers"
 
 	"github.com/gorilla/mux"
 
 	_ "github.com/lib/pq"
+	
 )
-
-// User is meant to be used below
-type User struct {
-	username       string
-	email          string
-	passwordDigest string
-	id             int
-}
 
 const (
 	host     = "localhost"
@@ -49,7 +44,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/users/show", UsersShow).Methods("GET")
-	r.HandleFunc("/signup", SignUp).Methods("POST")
+	r.HandleFunc("/signup", controller.Signup(db)).Methods("POST")
 	port := ":5000"
 
 	fmt.Println("App is listening on port " + port)
@@ -67,28 +62,7 @@ func main() {
 
 }
 
-// SignUp handles new user sign ups
-func SignUp(db) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var user models.User
-		var jwt models.JWT
-		var error models.Error
 
-		json.NewDecoder(r.Body).Decode(&user)
-
-		if user.Email == "" {
-			error.Message = "Email is missing."
-			utils.RespondWithError(w, http.StatusBadRequest, error)
-			return
-		}
-
-		if user.Password == "" {
-			error.Message = "Password is missing."
-			utils.RespondWithError(w, http.StatusBadRequest, error)
-			return
-		}
-	}
-}
 
 // UsersShow will be the users profile page
 func UsersShow(w http.ResponseWriter, r *http.Request) {
