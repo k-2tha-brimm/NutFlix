@@ -18,18 +18,6 @@ type User struct {
 	id             int
 }
 
-// Credentials is a struct that stores data from request body for signing
-type Credentials struct {
-	Password string `json:"password"`
-	Username string `json:"username"`
-}
-
-// Claims will be the encoded jwt
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
-
 const (
 	host     = "localhost"
 	port     = 5432
@@ -58,37 +46,48 @@ func init() {
 }
 
 func main() {
-
 	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler).Methods("GET")
+
 	r.HandleFunc("/users/show", UsersShow).Methods("GET")
-	r.HandleFunc("/signin", SignIn).Methods("GET")
-	port := ":3000"
+	r.HandleFunc("/signup", SignUp).Methods("POST")
+	port := ":5000"
 
 	fmt.Println("App is listening on port " + port)
 	http.ListenAndServe(port, r)
 
 	// defer db.Close()
 
-	// sqlStatement := `
-	// 	INSERT INTO users (username, password_digest, email)
-	// 	VALUES ($1, $2, $3)
-	// 	RETURNING id`
+
 
 	// var id int
 
-	// err = db.QueryRow(sqlStatement, "kevykev", "12345678", "kev.brimm@gmail.com").Scan(&id)
-	// if err != nil {
-	// 	panic(err)
-	// }
+
 
 	// fmt.Println("New record ID is:", id)
 
 }
 
-// HomeHandler will render the root template. Currently does not work.
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../../../index.html")
+// SignUp handles new user sign ups
+func SignUp(db) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user models.User
+		var jwt models.JWT
+		var error models.Error
+
+		json.NewDecoder(r.Body).Decode(&user)
+
+		if user.Email == "" {
+			error.Message = "Email is missing."
+			utils.RespondWithError(w, http.StatusBadRequest, error)
+			return
+		}
+
+		if user.Password == "" {
+			error.Message = "Password is missing."
+			utils.RespondWithError(w, http.StatusBadRequest, error)
+			return
+		}
+	}
 }
 
 // UsersShow will be the users profile page
@@ -119,17 +118,4 @@ func UsersShow(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "%s, %s, %d", user.username, user.email, user.id)
 
-}
-
-// SignIn is a sign in handler
-func SignIn(w http.ResponseWriter, r *http.Request) {
-	var creds Credentials
-
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	password := r.FormValue("password")
 }
