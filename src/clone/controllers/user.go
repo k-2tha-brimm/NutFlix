@@ -3,25 +3,25 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
 
-	"../repository"
 	"../models"
+	userrepository "../repository"
 	"../utils"
 
-	"golang.org/x/crypto/bcrypt"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var users []models.User
 
 // Controller struct
-type Controller struct{}
+type UserController struct{}
 
 // Login handles returning users
-func (c Controller) Login(db *sql.DB) http.HandlerFunc {
+func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		var jwt models.JWT
@@ -82,11 +82,11 @@ func (c Controller) Login(db *sql.DB) http.HandlerFunc {
 }
 
 // Signup for new users
-func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
+func (c UserController) Signup(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		var error models.Error
-		
+
 		json.NewDecoder(r.Body).Decode(&user)
 		fmt.Printf("%+v\n", user)
 
@@ -129,8 +129,8 @@ func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
 }
 
 // Show to display profile
-func (c Controller) Show(db *sql.DB) http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+func (c UserController) Show(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		params := mux.Vars(r)
 

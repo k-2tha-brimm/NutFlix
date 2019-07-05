@@ -4,14 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+
 	"./controllers"
 
 	"github.com/gorilla/mux"
 
 	_ "github.com/lib/pq"
-	
 )
-
 
 const (
 	host     = "localhost"
@@ -43,11 +42,13 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 
-	controller := controllers.Controller{}
+	userController := controllers.UserController{}
+	movieController := controllers.MovieController{}
 
-	r.HandleFunc("/users/{id}", controller.Show(db)).Methods("GET")
-	r.HandleFunc("/signup", controller.Signup(db)).Methods("POST")
-	r.HandleFunc("/login", controller.Login(db)).Methods("POST")
+	r.HandleFunc("/users/{id}", userController.Show(db)).Methods("GET")
+	r.HandleFunc("/home", movieController.Index(db)).Methods("GET")
+	r.HandleFunc("/signup", userController.Signup(db)).Methods("POST")
+	r.HandleFunc("/login", userController.Login(db)).Methods("POST")
 	port := ":5000"
 
 	fmt.Println("App is listening on port " + port)
