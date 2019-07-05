@@ -45,7 +45,7 @@ func main() {
 
 	controller := controllers.Controller{}
 
-	// r.HandleFunc("/users/show", controller.Show(db)).Methods("GET")
+	r.HandleFunc("/users/{id}", controller.Show(db)).Methods("GET")
 	r.HandleFunc("/signup", controller.Signup(db)).Methods("POST")
 	r.HandleFunc("/login", controller.Login(db)).Methods("POST")
 	port := ":5000"

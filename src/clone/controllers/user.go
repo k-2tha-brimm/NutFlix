@@ -12,9 +12,13 @@ import (
 	"../utils"
 
 	"golang.org/x/crypto/bcrypt"
+	"github.com/gorilla/mux"
 )
 
 var users []models.User
+
+// User model
+
 
 // Controller struct
 type Controller struct{}
@@ -127,35 +131,40 @@ func (c Controller) Signup(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// UsersShow to display profile
-// func (c Controller) UsersShow(db *sql.DB) http.HandlerFunc {
-// 	return func (w http.ResponseWriter, r *http.Request) {
+// Show to display profile
+func (c Controller) Show(db *sql.DB) http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		var user models.User
+		params := mux.Vars(r)
 
-// 		if r.Method != "GET" {
-// 			http.Error(w, http.StatusText(405), 405)
-// 			return
-// 		}
+		fmt.Printf("HELLO")
 
-// 		id := r.FormValue("id")
-// 		fmt.Printf(id)
-// 		if id == "" {
-// 			http.Error(w, http.StatusText(400), 400)
-// 			return
-// 		}
+		if r.Method != "GET" {
+			http.Error(w, http.StatusText(405), 405)
+			return
+		}
 
-// 		row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
+		id := params["id"]
+		fmt.Printf(id)
 
-// 		// user := new(User)
-// 		err := row.Scan(&user.username, &user.email, &user.passwordDigest, &user.id)
-// 		if err == sql.ErrNoRows {
-// 			http.NotFound(w, r)
-// 			return
-// 		} else if err != nil {
-// 			http.Error(w, http.StatusText(500), 500)
-// 			return
-// 		}
+		if id == "" {
+			http.Error(w, http.StatusText(400), 400)
+			return
+		}
 
-// 		fmt.Fprintf(w, "%s, %s, %d", user.username, user.email, user.id)
+		row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
 
-// 	}
-// }
+		newUser := user
+		err := row.Scan(&newUser.Username, &newUser.Email, &newUser.Password, &newUser.ID)
+		if err == sql.ErrNoRows {
+			http.NotFound(w, r)
+			return
+		} else if err != nil {
+			http.Error(w, http.StatusText(500), 500)
+			return
+		}
+
+		fmt.Fprintf(w, "%s, %s, %d", newUser.Username, newUser.Email, newUser.ID)
+
+	}
+}
