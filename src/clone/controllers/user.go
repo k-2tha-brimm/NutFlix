@@ -17,9 +17,6 @@ import (
 
 var users []models.User
 
-// User model
-
-
 // Controller struct
 type Controller struct{}
 
@@ -137,8 +134,6 @@ func (c Controller) Show(db *sql.DB) http.HandlerFunc {
 		var user models.User
 		params := mux.Vars(r)
 
-		fmt.Printf("HELLO")
-
 		if r.Method != "GET" {
 			http.Error(w, http.StatusText(405), 405)
 			return
@@ -155,7 +150,7 @@ func (c Controller) Show(db *sql.DB) http.HandlerFunc {
 		row := db.QueryRow("SELECT * FROM users WHERE id=$1", id)
 
 		newUser := user
-		err := row.Scan(&newUser.Username, &newUser.Email, &newUser.Password, &newUser.ID)
+		err := row.Scan(&newUser.ID, &newUser.Email, &newUser.Username, &newUser.Password)
 		if err == sql.ErrNoRows {
 			http.NotFound(w, r)
 			return
@@ -164,7 +159,8 @@ func (c Controller) Show(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		fmt.Fprintf(w, "%s, %s, %d", newUser.Username, newUser.Email, newUser.ID)
-
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(newUser)
 	}
 }
