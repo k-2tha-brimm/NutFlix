@@ -9,7 +9,8 @@ import (
 	"../models"
 )
 
-var movies []models.Movie
+// Movie struce import
+type Movie []models.Movie
 
 // MovieController struct
 type MovieController struct{}
@@ -17,7 +18,9 @@ type MovieController struct{}
 // Index will be used to display the users homepage of movies
 func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		movies = make([]*Movie, 0)
+		
+		var movies = make([]*Movie, 0)
+		var movie models.Movie
 
 		if r.Method != "GET" {
 			http.Error(w, http.StatusText(405), 405)
@@ -32,11 +35,11 @@ func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 		defer rows.Close()
 
 		for rows.Next() {
-			movie := new(Movie)
-			if err := rows.Scan(&movie.Title, &movie.Genre, &movie.ID); err != nil {
+			newMovie := new(Movie)
+			if err := rows.Scan(&newMovie.Title, &newMovie.Genre, &newMovie.ID); err != nil {
 				fmt.Println(err)
 			}
-			movies = append(movies, movie)
+			movies = append(movies, newMovie)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
