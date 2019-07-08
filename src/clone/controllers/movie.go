@@ -10,7 +10,7 @@ import (
 )
 
 // Movie struce import
-type Movie []models.Movie
+var movies []models.Movie
 
 // MovieController struct
 type MovieController struct{}
@@ -19,7 +19,7 @@ type MovieController struct{}
 func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		
-		var movies = make([]*Movie, 0)
+		var movies = make([] models.Movie, 0)
 		var movie models.Movie
 
 		if r.Method != "GET" {
@@ -35,7 +35,7 @@ func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 		defer rows.Close()
 
 		for rows.Next() {
-			newMovie := new(Movie)
+			newMovie := movie
 			if err := rows.Scan(&newMovie.Title, &newMovie.Genre, &newMovie.ID); err != nil {
 				fmt.Println(err)
 			}

@@ -17,7 +17,7 @@ import (
 
 var users []models.User
 
-// Controller struct
+// UserController struct
 type UserController struct{}
 
 // Login handles returning users
