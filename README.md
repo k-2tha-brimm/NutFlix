@@ -4,7 +4,7 @@ A Nut Themed take on the popular video streaming service NetFlix.
 
 ## Technologies
 
-Go/PostgreSQL, for now. Frontend JS framework still to be determined.
+Go/PostgreSQL/Vue.js.
 
 ## Implementation Timeline and Details
 

@@ -3,7 +3,9 @@
     <h1>BEHOLD!</h1>
     <h2>MOVIES JSON</h2>
     <button @click="getMovies">Get Movies</button>
-    <p class="movies" v-if="movies"></p>
+    <div class="movies" v-for="movie in movies">
+      {{ movie.title }}
+    </div>
   </div>
 </template>
 
