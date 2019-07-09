@@ -3,7 +3,7 @@
     <h1>BEHOLD!</h1>
     <h2>MOVIES JSON</h2>
     <button @click="getMovies">Get Movies</button>
-    <div class="movies" v-for="movie in movies">
+    <div class="movies" v-for="movie in movies" v-bind:key="movie.id">
       {{ movie.title }}
     </div>
   </div>
