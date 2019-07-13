@@ -1,6 +1,9 @@
 <template>
     <div class="movie">
         <h1>This is a test</h1>
+        <div class="movies" v-bind:key="movie.id">
+            {{ movie.title }}
+        </div>
     </div>
 </template>
 

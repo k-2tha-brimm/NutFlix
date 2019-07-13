@@ -5,14 +5,19 @@
     <button @click="getMovies">Get Movies</button>
     <div class="movies" v-for="movie in movies" v-bind:key="movie.id">
       {{ movie.title }}
+      <MovieComponent></MovieComponent>
     </div>
   </div>
 </template>
 
 <script>
 import {HTTP} from '../http-constants';
+import MovieComponent from './Movie.vue';
 export default {
   name: 'Splash',
+  components: {
+    'MovieComponent': MovieComponent
+  },
   data () {
     return {
       movies: [],
