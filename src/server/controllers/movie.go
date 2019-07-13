@@ -52,12 +52,13 @@ func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// Show comment
 func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var movie = models.Movie
+		var movie models.Movie
 		params := mux.Vars(r)
 
-		if r.Method !- "GET" {
+		if r.Method != "GET" {
 			http.Error(w, http.StatusText(405), 405)
 			return
 		}
@@ -65,7 +66,7 @@ func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 		id := params["id"]
 		fmt.Printf(id)
 
-		if id = "" {
+		if id == "" {
 			http.Error(w, http.StatusText(400), 400)
 			return
 		}
@@ -73,7 +74,7 @@ func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 		row := db.QueryRow("SELECT * FROM movies WHERE id=$1", id)
 
 		newMovie := movie
-		err := row.Scan(&newMovie.ID, &newMovie.Title, &newMovie.Genre)
+		err := row.Scan(&newMovie.Title, &newMovie.Genre, &newMovie.ID)
 		if err == sql.ErrNoRows {
 			http.NotFound(w, r)
 			return
@@ -82,9 +83,11 @@ func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		enableCors(&w)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.newEncoder(w).Encode(newMovie)
+		json.NewEncoder(w).Encode(newMovie)
 	}
 }
 

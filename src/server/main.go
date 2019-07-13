@@ -47,6 +47,7 @@ func main() {
 
 	r.HandleFunc("/api/users/{id}", userController.Show(db)).Methods("GET")
 	r.HandleFunc("/api/movies", movieController.Index(db)).Methods("GET")
+	r.HandleFunc("/api/movies/{id}", movieController.Show(db)).Methods("GET")
 	r.HandleFunc("/signup", userController.Signup(db)).Methods("POST")
 	r.HandleFunc("/login", userController.Login(db)).Methods("POST")
 	port := ":5000"
