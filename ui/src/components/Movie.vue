@@ -1,9 +1,6 @@
 <template>
     <div class="movie">
-        <h1>This is a test</h1>
-        <div class="movies" v-bind:key="movie.id">
-            {{ movie.title }}
-        </div>
+        <h1>{{movie.title}}</h1>
     </div>
 </template>
 
@@ -11,19 +8,22 @@
     import {HTTP} from '../http-constants';
     export default {
         name: 'Movie',
+        props: ['movie'],
         data() {
             return {
-                movie: {},
                 errors: ''
             }
         },
-        method: {
-            getMovie: function (id) {
-                HTTP.get(`/api/movies/${id}`)
-                .then(res => {
-                    this.movie = res.data
-                })
-            }
-        }
+        // method: {
+        //     getMovie: function (id) {
+        //         HTTP.get(`/api/movies/${id}`)
+        //         .then(res => {
+        //             this.movie = res.data
+        //         })
+        //     }
+        // },
+        // beforeMount() {
+        //     this.getMovie()
+        // }
     }
 </script>
