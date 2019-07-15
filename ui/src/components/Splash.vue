@@ -1,8 +1,6 @@
 <template>
   <div class="hello">
-    <h1>BEHOLD!</h1>
-    <h2>MOVIES JSON</h2>
-    <button @click="getMovies">Get Movies</button>
+    <h1>Nutflix</h1>
     <div class="movies" v-for="movie in movies" v-bind:key="movie.id">
       <MovieComponent v-bind:movie="movie"></MovieComponent>
     </div>
@@ -34,6 +32,9 @@ export default {
         this.errors = e
       })
     }
+  },
+  beforeMount() {
+    this.getMovies();
   }
 }
 </script>

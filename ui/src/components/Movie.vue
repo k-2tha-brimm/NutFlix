@@ -21,9 +21,6 @@
         //             this.movie = res.data
         //         })
         //     }
-        // },
-        // beforeMount() {
-        //     this.getMovie()
         // }
     }
 </script>
