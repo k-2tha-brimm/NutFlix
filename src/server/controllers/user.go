@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"../models"
 	userrepository "../repository"
 	"../utils"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,26 +22,82 @@ var users []models.User
 // UserController struct
 type UserController struct{}
 
+// Claims struct
+type Claims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
+var jwtKey = []byte("my_secret_key")
+
 // Login handles returning users
+// func (c UserController) Login(db *sql.DB) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var user models.User
+// 		var jwt models.JWT
+// 		var error models.Error
+
+// 		json.NewDecoder(r.Body).Decode(&user)
+
+// 		if user.Email == "" {
+// 			error.Message = "Email is missing."
+// 			utils.RespondWithError(w, http.StatusBadRequest, error)
+// 			return
+// 		}
+
+// 		if user.Password == "" {
+// 			error.Message = "Password is missing."
+// 			utils.RespondWithError(w, http.StatusBadRequest, error)
+// 			return
+// 		}
+
+// password := user.Password
+
+// userRepo := userrepository.UserRepository{}
+// user, err := userRepo.Login(db, user)
+
+// log.Println(err)
+
+// if err != nil {
+// 	if err == sql.ErrNoRows {
+// 		error.Message = "The user does not exist"
+// 		utils.RespondWithError(w, http.StatusBadRequest, error)
+// 		return
+// 	} else {
+// 		log.Fatal(err)
+// 	}
+// }
+
+// hashedPassword := user.Password
+
+// err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+
+// if err != nil {
+// 	error.Message = "Invalid Password"
+// 	utils.RespondWithError(w, http.StatusUnauthorized, error)
+// 	return
+// }
+
+// 		token, err := utils.GenerateToken(user)
+
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		w.WriteHeader(http.StatusOK)
+// 		jwt.Token = token
+
+// 		utils.ResponseJSON(w, jwt)
+// 	}
+// }
+
+// Login function to log the user in
 func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
-		var jwt models.JWT
 		var error models.Error
 
 		json.NewDecoder(r.Body).Decode(&user)
-
-		if user.Email == "" {
-			error.Message = "Email is missing."
-			utils.RespondWithError(w, http.StatusBadRequest, error)
-			return
-		}
-
-		if user.Password == "" {
-			error.Message = "Password is missing."
-			utils.RespondWithError(w, http.StatusBadRequest, error)
-			return
-		}
 
 		password := user.Password
 
@@ -68,16 +126,30 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		token, err := utils.GenerateToken(user)
+		expirationTime := time.Now().Add(60 * time.Minute)
 
-		if err != nil {
-			log.Fatal(err)
+		claims := &Claims{
+			Username: user.Username,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expirationTime.Unix(),
+			},
 		}
 
-		w.WriteHeader(http.StatusOK)
-		jwt.Token = token
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-		utils.ResponseJSON(w, jwt)
+		tokenString, err := token.SignedString(jwtKey)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   tokenString,
+			Expires: expirationTime,
+		})
+
 	}
 }
 
@@ -162,5 +234,46 @@ func (c UserController) Show(db *sql.DB) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newUser)
+	}
+}
+
+// Welcome will be the route for a signed in user
+func (c UserController) Welcome(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tknStr := c.Value
+
+		claims := &Claims{}
+
+		// Parse the JWT string and store the result in `claims`.
+		// Note that we are passing the key in this method as well. This method will return an error
+		// if the token is invalid (if it has expired according to the expiry time we set on sign in),
+		// or if the signature does not match
+		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		w.Write([]byte(fmt.Sprintf("Welcome %s!", claims.Username)))
 	}
 }

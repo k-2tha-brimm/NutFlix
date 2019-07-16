@@ -43,7 +43,7 @@ func GenerateToken(user models.User) (string, error) {
 	return tokenString, nil
 }
 
-// TokenVerifyMiddleWare is for authentication
+// TokenVerifyMiddleWare is for authentication and protecting our routes.
 func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var errorObject models.Error

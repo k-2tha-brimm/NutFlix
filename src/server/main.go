@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"./controllers"
+	"./utils"
 
 	"github.com/gorilla/mux"
 
@@ -45,9 +46,10 @@ func main() {
 	userController := controllers.UserController{}
 	movieController := controllers.MovieController{}
 
-	r.HandleFunc("/api/users/{id}", userController.Show(db)).Methods("GET")
-	r.HandleFunc("/api/movies", movieController.Index(db)).Methods("GET")
-	r.HandleFunc("/api/movies/{id}", movieController.Show(db)).Methods("GET")
+	r.HandleFunc("/welcome", userController.Welcome(db)).Methods("GET")
+	r.HandleFunc("/api/users/{id}", utils.TokenVerifyMiddleWare(userController.Show(db))).Methods("GET")
+	r.HandleFunc("/api/movies", utils.TokenVerifyMiddleWare(movieController.Index(db))).Methods("GET")
+	r.HandleFunc("/api/movies/{id}", utils.TokenVerifyMiddleWare(movieController.Show(db))).Methods("GET")
 	r.HandleFunc("/signup", userController.Signup(db)).Methods("POST")
 	r.HandleFunc("/login", userController.Login(db)).Methods("POST")
 	port := ":5000"

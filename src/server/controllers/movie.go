@@ -3,8 +3,8 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
 
@@ -20,8 +20,8 @@ type MovieController struct{}
 // Index will be used to display the users homepage of movies
 func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
-		var movies = make([] models.Movie, 0)
+
+		var movies = make([]models.Movie, 0)
 		var movie models.Movie
 
 		if r.Method != "GET" {
