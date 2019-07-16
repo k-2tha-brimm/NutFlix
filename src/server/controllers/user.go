@@ -30,67 +30,6 @@ type Claims struct {
 
 var jwtKey = []byte("my_secret_key")
 
-// Login handles returning users
-// func (c UserController) Login(db *sql.DB) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var user models.User
-// 		var jwt models.JWT
-// 		var error models.Error
-
-// 		json.NewDecoder(r.Body).Decode(&user)
-
-// 		if user.Email == "" {
-// 			error.Message = "Email is missing."
-// 			utils.RespondWithError(w, http.StatusBadRequest, error)
-// 			return
-// 		}
-
-// 		if user.Password == "" {
-// 			error.Message = "Password is missing."
-// 			utils.RespondWithError(w, http.StatusBadRequest, error)
-// 			return
-// 		}
-
-// password := user.Password
-
-// userRepo := userrepository.UserRepository{}
-// user, err := userRepo.Login(db, user)
-
-// log.Println(err)
-
-// if err != nil {
-// 	if err == sql.ErrNoRows {
-// 		error.Message = "The user does not exist"
-// 		utils.RespondWithError(w, http.StatusBadRequest, error)
-// 		return
-// 	} else {
-// 		log.Fatal(err)
-// 	}
-// }
-
-// hashedPassword := user.Password
-
-// err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-
-// if err != nil {
-// 	error.Message = "Invalid Password"
-// 	utils.RespondWithError(w, http.StatusUnauthorized, error)
-// 	return
-// }
-
-// 		token, err := utils.GenerateToken(user)
-
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-
-// 		w.WriteHeader(http.StatusOK)
-// 		jwt.Token = token
-
-// 		utils.ResponseJSON(w, jwt)
-// 	}
-// }
-
 // Login function to log the user in
 func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
