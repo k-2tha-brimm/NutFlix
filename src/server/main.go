@@ -46,12 +46,13 @@ func main() {
 	userController := controllers.UserController{}
 	movieController := controllers.MovieController{}
 
-	r.HandleFunc("/welcome", userController.Welcome(db)).Methods("GET")
+	// r.HandleFunc("/welcome", userController.Welcome(db)).Methods("GET")
 	r.HandleFunc("/api/users/{id}", utils.TokenVerifyMiddleWare(userController.Show(db))).Methods("GET")
-	r.HandleFunc("/api/movies", utils.TokenVerifyMiddleWare(movieController.Index(db))).Methods("GET")
+	r.HandleFunc("/api/movies", movieController.Index(db)).Methods("GET")
 	r.HandleFunc("/api/movies/{id}", utils.TokenVerifyMiddleWare(movieController.Show(db))).Methods("GET")
 	r.HandleFunc("/signup", userController.Signup(db)).Methods("POST")
 	r.HandleFunc("/login", userController.Login(db)).Methods("POST")
+	r.HandleFunc("/logout", userController.Logout())
 	port := ":5000"
 
 	fmt.Println("App is listening on port " + port)

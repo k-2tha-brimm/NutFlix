@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	// "time"
 
 	"../models"
 	userrepository "../repository"
 	"../utils"
 
-	"github.com/dgrijalva/jwt-go"
+	// "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,16 +23,22 @@ var users []models.User
 type UserController struct{}
 
 // Claims struct
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
+// type Claims struct {
+// 	Username string `json:"username"`
+// 	jwt.StandardClaims
+// }
 
 var jwtKey = []byte("my_secret_key")
 
 // Login function to log the user in
 func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		session, err := utils.Store.Get(r, "session")
+		if err != nil {
+			log.Println("error identifying session")
+			return
+		}
+
 		var user models.User
 		var error models.Error
 
@@ -41,12 +47,12 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 		password := user.Password
 
 		userRepo := userrepository.UserRepository{}
-		user, err := userRepo.Login(db, user)
+		user, erro := userRepo.Login(db, user)
 
 		log.Println(err)
 
-		if err != nil {
-			if err == sql.ErrNoRows {
+		if erro != nil {
+			if erro == sql.ErrNoRows {
 				error.Message = "The user does not exist"
 				utils.RespondWithError(w, http.StatusBadRequest, error)
 				return
@@ -65,29 +71,35 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		expirationTime := time.Now().Add(60 * time.Minute)
+		session.Values["loggedin"] = "true"
+		session.Values["email"] = user.Email
+		session.Save(r, w)
+		log.Print("User ", user.Email, " is authenticated")
 
-		claims := &Claims{
-			Username: user.Username,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: expirationTime.Unix(),
-			},
-		}
+		// expirationTime := time.Now().Add(120 * time.Minute)
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		// claims := &Claims{
+		// 	Username: user.Username,
+		// 	StandardClaims: jwt.StandardClaims{
+		// 		ExpiresAt: expirationTime.Unix(),
+		// 	},
+		// }
 
-		tokenString, err := token.SignedString(jwtKey)
+		// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// tokenString, err := token.SignedString(jwtKey)
 
-		http.SetCookie(w, &http.Cookie{
-			Name:    "token",
-			Value:   tokenString,
-			Expires: expirationTime,
-		})
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+
+		// http.SetCookie(w, &http.Cookie{
+		// 	Name:    "token",
+		// 	Value:   tokenString,
+		// 	Path: "/",
+		// 	Expires: expirationTime,
+		// })
 
 	}
 }
@@ -177,42 +189,56 @@ func (c UserController) Show(db *sql.DB) http.HandlerFunc {
 }
 
 // Welcome will be the route for a signed in user
-func (c UserController) Welcome(db *sql.DB) http.HandlerFunc {
+// func (c UserController) Welcome(db *sql.DB) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		c, err := r.Cookie("token")
+// 		if err != nil {
+// 			if err == http.ErrNoCookie {
+// 				w.WriteHeader(http.StatusUnauthorized)
+// 				return
+// 			}
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			return
+// 		}
+
+// 		tknStr := c.Value
+
+// 		claims := &Claims{}
+
+// 		// Parse the JWT string and store the result in `claims`.
+// 		// Note that we are passing the key in this method as well. This method will return an error
+// 		// if the token is invalid (if it has expired according to the expiry time we set on sign in),
+// 		// or if the signature does not match
+// 		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+// 			return jwtKey, nil
+// 		})
+// 		if err != nil {
+// 			if err == jwt.ErrSignatureInvalid {
+// 				w.WriteHeader(http.StatusUnauthorized)
+// 				return
+// 			}
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			return
+// 		}
+// 		if !tkn.Valid {
+// 			w.WriteHeader(http.StatusUnauthorized)
+// 			return
+// 		}
+
+// 		w.Write([]byte(fmt.Sprintf("Welcome %s!", claims.Username)))
+// 	}
+// }
+
+//Logout logs the user out duh
+func (c UserController) Logout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
+		session, err := utils.Store.Get(r, "session")
+		if err == nil { //If there is no error, then remove session
+			if session.Values["loggedin"] != "false" {
+				session.Values["loggedin"] = "false"
+				session.Save(r, w)
 			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
 		}
-
-		tknStr := c.Value
-
-		claims := &Claims{}
-
-		// Parse the JWT string and store the result in `claims`.
-		// Note that we are passing the key in this method as well. This method will return an error
-		// if the token is invalid (if it has expired according to the expiry time we set on sign in),
-		// or if the signature does not match
-		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
-		})
-		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		if !tkn.Valid {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		w.Write([]byte(fmt.Sprintf("Welcome %s!", claims.Username)))
+		log.Print("User had been logged out!")
 	}
 }
