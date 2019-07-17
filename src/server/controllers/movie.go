@@ -58,39 +58,41 @@ func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 // Show comment
 func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var movie models.Movie
-		params := mux.Vars(r)
+		if utils.IsLoggedIn(r) {
+			var movie models.Movie
+			params := mux.Vars(r)
 
-		if r.Method != "GET" {
-			http.Error(w, http.StatusText(405), 405)
-			return
+			if r.Method != "GET" {
+				http.Error(w, http.StatusText(405), 405)
+				return
+			}
+
+			id := params["id"]
+			fmt.Printf(id)
+
+			if id == "" {
+				http.Error(w, http.StatusText(400), 400)
+				return
+			}
+
+			row := db.QueryRow("SELECT * FROM movies WHERE id=$1", id)
+
+			newMovie := movie
+			err := row.Scan(&newMovie.Title, &newMovie.Genre, &newMovie.ID)
+			if err == sql.ErrNoRows {
+				http.NotFound(w, r)
+				return
+			} else if err != nil {
+				http.Error(w, http.StatusText(500), 500)
+				return
+			}
+
+			enableCors(&w)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(newMovie)
 		}
-
-		id := params["id"]
-		fmt.Printf(id)
-
-		if id == "" {
-			http.Error(w, http.StatusText(400), 400)
-			return
-		}
-
-		row := db.QueryRow("SELECT * FROM movies WHERE id=$1", id)
-
-		newMovie := movie
-		err := row.Scan(&newMovie.Title, &newMovie.Genre, &newMovie.ID)
-		if err == sql.ErrNoRows {
-			http.NotFound(w, r)
-			return
-		} else if err != nil {
-			http.Error(w, http.StatusText(500), 500)
-			return
-		}
-
-		enableCors(&w)
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(newMovie)
 	}
 }
 
