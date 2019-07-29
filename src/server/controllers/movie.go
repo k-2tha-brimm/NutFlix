@@ -3,11 +3,11 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
-	"github.com/gorilla/mux"
 	"../utils"
+	"github.com/gorilla/mux"
 
 	"../models"
 )
@@ -22,8 +22,8 @@ type MovieController struct{}
 func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if utils.IsLoggedIn(r) {
-		
-			var movies = make([] models.Movie, 0)
+
+			var movies = make([]models.Movie, 0)
 			var movie models.Movie
 
 			if r.Method != "GET" {
@@ -68,7 +68,6 @@ func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 			}
 
 			id := params["id"]
-			fmt.Printf(id)
 
 			if id == "" {
 				http.Error(w, http.StatusText(400), 400)
