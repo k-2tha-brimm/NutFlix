@@ -51,6 +51,8 @@ func (c MovieController) Index(db *sql.DB) http.HandlerFunc {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(movies)
+		} else {
+			http.Error(w, http.StatusText(403), 403)
 		}
 	}
 }
@@ -91,6 +93,8 @@ func (c MovieController) Show(db *sql.DB) http.HandlerFunc {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(newMovie)
+		} else {
+			http.Error(w, http.StatusText(403), 403)
 		}
 	}
 }
