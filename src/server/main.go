@@ -7,6 +7,7 @@ import (
 
 	"./controllers"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	_ "github.com/lib/pq"
@@ -41,6 +42,9 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST"})
+	origins := handlers.AllowedOrigins([]string{"*"})
 
 	userController := controllers.UserController{}
 	movieController := controllers.MovieController{}
@@ -53,6 +57,6 @@ func main() {
 	r.HandleFunc("/logout", userController.Logout())
 	port := ":5000"
 
-	fmt.Println("App is listening on port " + port)
-	http.ListenAndServe(port, r)
+	fmt.Println("Listening on port " + port)
+	http.ListenAndServe(port, handlers.CORS(headers, methods, origins)(r))
 }

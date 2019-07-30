@@ -31,6 +31,9 @@
 
 <script>
     import {HTTP} from '../http-constants';
+    import axios from 'axios';
+
+
     export default {
         name: 'LogIn',
         data() {
@@ -45,10 +48,10 @@
         },
         methods: {
             signin: function () {
-                HTTP.post("/login", {
+                axios.post("http://localhost:5000/login", {
                     data: this.input,
                     headers: {
-                        "Content-Type": 'application/json',
+                        "Content-Type": 'application/x-www-form-urlencoded',
                         "Access-Control-Allow-Origin": "*"
                     }
                 }).then(res => {
