@@ -48,11 +48,15 @@
         },
         methods: {
             signin: function () {
-                axios.post("http://localhost:5000/login", {
-                    data: this.input,
+                
+                let data = JSON.stringify({
+                    email: this.input.email,
+                    password: this.input.password
+                });
+
+                axios.post("http://localhost:5000/login", data, {
                     headers: {
-                        "Content-Type": 'application/x-www-form-urlencoded',
-                        "Access-Control-Allow-Origin": "*"
+                        'Content-Type': 'application/json'
                     }
                 }).then(res => {
                         console.log(res)

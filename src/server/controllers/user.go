@@ -32,14 +32,16 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 		var user models.User
 		var error models.Error
 
+		log.Println(r.Body)
+
 		json.NewDecoder(r.Body).Decode(&user)
 
 		password := user.Password
 
-		enableCors(&w)
-
 		userRepo := userrepository.UserRepository{}
 		user, erro := userRepo.Login(db, user)
+
+		log.Println(user)
 
 		log.Println(err)
 
