@@ -36,6 +36,8 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 
 		password := user.Password
 
+		enableCors(&w)
+
 		userRepo := userrepository.UserRepository{}
 		user, erro := userRepo.Login(db, user)
 
