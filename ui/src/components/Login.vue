@@ -19,9 +19,9 @@
                 class="form-control"
                 v-model="input.password"
                 placeholder="Password">
-
-                <button type="button"
-                    v-on:click="signin()">Sign In</button>
+                <router-link class="browse" to="/browse">Browse</router-link>
+                    <button type="button"
+                        v-on:click="signin()">Sign In</button>
         </div>
 
         <!-- <p>{{ response }}</p> -->
@@ -32,10 +32,14 @@
 <script>
     import {HTTP} from '../http-constants';
     import axios from 'axios';
+    import Browse from './Browse.vue';
 
 
     export default {
         name: 'LogIn',
+        components: {
+            'browse': Browse
+        },
         data() {
             return {
                 input: {
