@@ -22,7 +22,10 @@ let router = new Router({
     {
       path: '/login',
       name: 'LogIn',
-      component: LogIn
+      component: LogIn,
+      meta: {
+        guest: true
+      }
     },
     {
       path: '/browse',
@@ -35,10 +38,18 @@ let router = new Router({
   ]
 })
 
-// router.beforeEach((to, from, next) => {
-//   if(to.matched.some(record => record.meta.requiresAuth)) {
-//     if(local)
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    if(localStorage.getItem('session') !== true) {
+      next({
+        path: '/login'
+      })
+    } else {
+      let user = JSON.parse(localStorage.getItem('user'))
+    }
+  } else {
+    next();
+  }
+})
 
 export default router;

@@ -59,11 +59,12 @@
                         'Content-Type': 'application/json'
                     }
                 }).then(res => {
-                        console.log(res);
-                    })
-                    .catch(e => {
-                        this.errors = e
-                    })
+                    localStorage.setItem('user', JSON.stringify(res.data.email));
+                    localStorage.setItem('session', true);
+                    console.log(res);
+                }).catch(e => {
+                    this.errors = e
+                })
             }
         }
     }
