@@ -68,6 +68,8 @@ func (c UserController) Login(db *sql.DB) http.HandlerFunc {
 		session.Values["loggedin"] = "true"
 		session.Values["email"] = user.Email
 		session.Save(r, w)
+
+		utils.ResponseJSON(w, user)
 		log.Print("User ", user.Email, " is authenticated")
 
 	}

@@ -7,7 +7,7 @@ import Browse from '@/components/Browse';
 
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
   routes: [
     {
       path: '/',
@@ -27,7 +27,18 @@ export default new Router({
     {
       path: '/browse',
       name: 'Browse',
-      component: Browse
+      component: Browse,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
+
+// router.beforeEach((to, from, next) => {
+//   if(to.matched.some(record => record.meta.requiresAuth)) {
+//     if(local)
+//   }
+// })
+
+export default router;

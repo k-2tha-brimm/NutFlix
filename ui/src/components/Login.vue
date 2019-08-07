@@ -49,7 +49,7 @@
         methods: {
             signin: function () {
                 
-                let data = JSON.stringify({
+                let data = ({
                     email: this.input.email,
                     password: this.input.password
                 });
@@ -59,7 +59,7 @@
                         'Content-Type': 'application/json'
                     }
                 }).then(res => {
-                        console.log(res)
+                        console.log(res);
                     })
                     .catch(e => {
                         this.errors = e
