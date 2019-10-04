@@ -128,7 +128,6 @@ func (c UserController) Show(db *sql.DB) http.HandlerFunc {
 		}
 
 		id := params["id"]
-		fmt.Printf(id)
 
 		if id == "" {
 			http.Error(w, http.StatusText(400), 400)
