@@ -65,7 +65,6 @@
                 }).then(res => {
                     localStorage.setItem('user', JSON.stringify(res.data.email));
                     localStorage.setItem('session', true);
-                    console.log(res);
                 }).catch(e => {
                     this.errors = e
                 })
